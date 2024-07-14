@@ -1,0 +1,29 @@
+#version: '3.8'  # Specify the Docker Compose version
+
+services:
+  db:    # The MySQL database service
+    image: mysql:latest   # Use the official MySQL image
+    restart: always        # Restart the container if it stops
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'yes' # must be use if we want to na password
+      MYSQL_ROOT_PASSWORD: ''  # Set the root password to empty (no password)
+      MYSQL_DATABASE: mydatabase   # Optional: create a default database (change "mydatabase" if needed)
+    ports:
+      - '3306:3306'  # Expose port 3306 to the host machine
+    volumes:
+      - db_data:/var/lib/mysql   # Persist database data
+
+  phpmyadmin:  # The phpMyAdmin service for web-based management
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - '8080:80'  # Expose phpMyAdmin on port 8080
+    environment:
+      PMA_HOST: db  # Connect to the "db" service
+      PMA_PORT: 3306
+      # Optional: PMA_USER and PMA_PASSWORD if you want to specify a different phpMyAdmin user
+    depends_on:
+      - db  # Ensure MySQL is running before phpMyAdmin
+
+volumes:
+  db_data:   # Named volume to store MySQL data
